@@ -1,7 +1,7 @@
 package example
 
 import airflow.model.Dag
-import tasks.BashTask
+import airflow.tasks.BashTask
 
 
 class BashDag extends Dag(id="My Bash Dag", desc="Super cool dag") {
@@ -15,6 +15,9 @@ class BashDag extends Dag(id="My Bash Dag", desc="Super cool dag") {
     bashCommand = "echo Hello Planets")
 
   bashOp2 >> bashOp1
-  //  final def setUpstream
+
+  // Start the Dag
+  start(bashOp2)
+
 }
 

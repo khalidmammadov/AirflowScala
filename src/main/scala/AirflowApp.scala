@@ -1,4 +1,6 @@
 
+import airflow.Controller
+
 trait BaseCommand
 
 trait Command extends BaseCommand {
@@ -6,6 +8,8 @@ trait Command extends BaseCommand {
 }
 
 object AirflowApp extends App {
+
+  val controller = new Controller()
 
   case class ParentCommand(sub_commands: Map[String, Command]) extends Command {
     override def execute(args: Array[String]): Unit = {
@@ -19,13 +23,20 @@ object AirflowApp extends App {
     }
   }
 
-  val dagsCommand = ParentCommand(Map("trigger"-> ChildCommand("Triggering dag"),
+  case class TriggerDagCommand() extends Command {
+    override def execute(args: Array[String]): Unit = {
+      print(s"Triggering Dag: ${args(0)}")
+      controller.executeDag(args(0))
+    }
+  }
+
+  val dagsCommand = ParentCommand(Map("trigger"-> TriggerDagCommand(),
       "list"->ChildCommand("Listing dags")))
 
   val tasksCommand = ParentCommand(Map("run"->ChildCommand("Running app"),
       "list"->ChildCommand("Listing tasks")))
 
-  val commands = Map("tasks"->tasksCommand,
+  val commands = Map("airflow/tasks" ->tasksCommand,
     "dags"->dagsCommand)
 
 
