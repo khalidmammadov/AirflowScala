@@ -24,11 +24,11 @@ trait BaseTask {
   }
 
   def >>(other: BaseTask): Unit = {
-    setUpstream(other)
+    setDownstream(other)
   }
 
   def <<(other: BaseTask): Unit = {
-    setDownstream(other)
+    setUpstream(other)
   }
 
   def logTaskExecution():Unit = {

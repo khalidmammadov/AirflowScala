@@ -5,15 +5,14 @@ import airflow.tasks.BaseTask
 class Dag(id: String, desc: String) {
 
   def traverseTasks(tasks: List[BaseTask]): Unit = tasks match {
-    case List(task) =>
+    case List() =>
+    case task::otherTasks =>
       //Execute the task!
       if (task.executeTask() == 0)
         traverseTasks(task.downstreams.toList)
       else throw new RuntimeException(s"Task ${task.id} failed")
-    case task::otherTasks =>
-      traverseTasks(List(task))
+      //Run others
       traverseTasks(otherTasks)
-    case List() =>
   }
 
 
