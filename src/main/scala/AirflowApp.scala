@@ -25,7 +25,7 @@ object AirflowApp extends App {
 
   case class TriggerDagCommand() extends Command {
     override def execute(args: Array[String]): Unit = {
-      print(s"Triggering Dag: ${args(0)}")
+      println(s"Triggering Dag: ${args(0)}")
       controller.executeDag(args(0))
     }
   }

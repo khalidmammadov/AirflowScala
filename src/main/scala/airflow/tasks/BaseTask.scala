@@ -7,12 +7,11 @@ trait BaseTask {
 
   val id: String
 
-  private[airflow] var upstreams = new ListBuffer[BaseTask]()
   private[airflow] var downstreams = new ListBuffer[BaseTask]()
 
   def setUpstream(other: BaseTask): Unit = {
     if (other != this) {
-      upstreams.addOne(other)
+      other.setDownstream(this)
     } else throw new IllegalArgumentException("Can't set upstream to myself!")
 
   }
@@ -30,6 +29,15 @@ trait BaseTask {
 
   def <<(other: BaseTask): Unit = {
     setDownstream(other)
+  }
+
+  def logTaskExecution():Unit = {
+    println(s"Executing Task: ${this.id}")
+  }
+
+  private[airflow] def executeTask():Int = {
+    logTaskExecution()
+    execute()
   }
 
   def execute(): Int
