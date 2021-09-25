@@ -1,28 +1,39 @@
 package airflow.model
 
+import collection.mutable.ListBuffer
 import airflow.tasks.BaseTask
 
 class Dag(id: String, desc: String) {
 
-  def traverseTasks(tasks: List[BaseTask]): Unit = tasks match {
+  val tasksForRun = new ListBuffer[BaseTask]
+
+  def traverseDagTasksRun(tasks: List[BaseTask]): Unit = tasks match {
     case List() =>
     case task::otherTasks =>
       //Execute the task!
       if (task.executeTask() == 0)
-        traverseTasks(task.downstreams.toList)
+        traverseDagTasksRun(task.downstreams.toList)
       else throw new RuntimeException(s"Task ${task.id} failed")
       //Run others
-      traverseTasks(otherTasks)
+      traverseDagTasksRun(otherTasks)
+  }
+
+  def addToRunQueue(task: BaseTask):Unit = {
+    // Add if not added already
+    if ( !tasksForRun.exists(t=> t.id == task.id) ) {
+      tasksForRun.addOne(task)
+    } else throw new ExceptionInInitializerError(s"You cant add task \"$task\" twice! ")
   }
 
 
-  def start(initTask: BaseTask):Unit = {
-    println(s"Staring Dag: $id")
-    println(s"Description: $desc")
-    val initList = List(initTask)
+  //TO DO set below
+  //private[airflow]
+  def start():Unit = {
+    println(s"Staring Dag1: $id")
+    println(s"Description1: $desc")
 
-    traverseTasks(initList)
-//    initTask.downstream.foreach(_.execute())
+    traverseDagTasksRun(tasksForRun.toList)
+
   }
 
 }
